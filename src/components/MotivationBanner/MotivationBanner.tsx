@@ -110,7 +110,7 @@ export function MotivationBanner({ intervalMs = 5000 }: MotivationBannerProps) {
     <div
       role="banner"
       aria-live="polite"
-      className="w-full bg-green-600 text-white px-4 py-2 flex items-center justify-between gap-4"
+      className="w-full bg-green-600 text-white px-4 py-2 flex items-center justify-between gap-4 min-h-[3.5rem]"
     >
       {/* Rotating message with CSS opacity transition */}
       <p

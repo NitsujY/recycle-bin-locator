@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.leaflet-marker-icon.marker-highlighted {
+	filter: hue-rotate(-30deg) saturate(2.2) drop-shadow(0 0 6px rgba(16, 185, 129, 0.8));
+	transform: scale(1.18);
+	z-index: 1000 !important;
+}

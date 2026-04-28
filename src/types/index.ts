@@ -7,6 +7,7 @@ export interface LatLng {
 // Material category — const object + derived union type (enum-equivalent, erasable)
 export const MaterialCategory = {
   Paper: "paper",
+  Metal: "metal",
   Plastic: "plastic",
   Glass: "glass",
   LightBulb: "light_bulb",

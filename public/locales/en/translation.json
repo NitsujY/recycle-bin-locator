@@ -1,12 +1,18 @@
 {
   "app.title": "Recycle Bin Locator",
   "search.placeholder": "Enter address or place name…",
+  "distance.filter_label": "Range",
+  "map.enter_fullscreen": "Full view",
+  "map.exit_fullscreen": "Exit full view",
   "category.paper": "Paper",
+  "category.metal": "Metal",
   "category.plastic": "Plastic",
   "category.glass": "Glass",
   "category.light_bulb": "Light Bulb",
   "category.battery": "Battery",
   "category.other": "Other",
+  "category.onboarding_title": "Quick material filter",
+  "category.onboarding_prompt": "Choose what you are recycling now. Press Esc to close.",
   "badge.first_visit": "First Step",
   "badge.visits_10": "10 Visits",
   "badge.visits_50": "50 Visits",
@@ -25,7 +31,6 @@
   "stats.total_visits": "Total Visits",
   "stats.unique_points": "Unique Points Visited",
   "stats.categories_recycled": "Categories Recycled",
-  "log_visit": "Log Visit",
   "achievements": "Achievements",
   "language": "Language"
 }

@@ -8,7 +8,6 @@ export interface CollectionPointListProps {
   points: CollectionPoint[];
   selectedId?: string;
   onSelect: (id: string) => void;
-  onLogVisit: (point: CollectionPoint) => void;
   isLoading?: boolean;
 }
 
@@ -52,13 +51,12 @@ function SkeletonCard() {
  * - When not loading and `points` is empty, shows the
  *   `collection_point.no_results_nearby` i18n message.
  * - Otherwise renders one `CollectionPointCard` per point, forwarding
- *   `isSelected`, `onLogVisit`, and an `onClick` that calls `onSelect(point.id)`.
+ *   `isSelected` and an `onClick` that calls `onSelect(point.id)`.
  */
 export function CollectionPointList({
   points,
   selectedId,
   onSelect,
-  onLogVisit,
   isLoading = false,
 }: CollectionPointListProps) {
   const { t } = useTranslation();
@@ -86,6 +84,7 @@ export function CollectionPointList({
         points.map((point) => (
           <div
             key={point.id}
+            data-point-id={point.id}
             onClick={() => onSelect(point.id)}
             role="button"
             tabIndex={0}
@@ -95,12 +94,11 @@ export function CollectionPointList({
                 onSelect(point.id);
               }
             }}
-            className="cursor-pointer"
+            className={point.id === selectedId ? "cursor-pointer rounded-xl bg-green-50" : "cursor-pointer"}
           >
             <CollectionPointCard
               point={point}
               isSelected={point.id === selectedId}
-              onLogVisit={onLogVisit}
             />
           </div>
         ))}

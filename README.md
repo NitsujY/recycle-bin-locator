@@ -5,10 +5,16 @@
 A fully static, client-side web application that helps users find nearby recycling collection points. Select the material you want to recycle, and the app shows the nearest suitable bins on a map and ranked list — no account required, no server needed.
 
 - Detects your location automatically (or search by address)
-- Filter by material category: Paper, Plastic, Glass, Light Bulb, Battery, and more
+- Filter by material category: Paper, Metal, Plastic, Glass, Light Bulb, Battery, and more
 - Supports English and Traditional Chinese based on your browser locale
-- Earn achievement badges as you log recycling visits
 - Deployed on GitHub Pages at zero hosting cost
+
+## Product Phases
+
+- Phase 1 (current): map + search + distance/material filtering + bilingual UI.
+- Phase 2 (planned): account-based achievement and visit logging.
+
+Achievement-related UI is intentionally disabled in Phase 1 and will return in Phase 2 when user accounts are introduced.
 
 ## Live Demo
 

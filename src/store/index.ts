@@ -13,7 +13,6 @@ interface AppState {
   dataError: string | null;
   locationError: string | null;
   searchError: string | null;
-  achievementRefreshKey: number; // increment to trigger AchievementPanel refresh
 
   // Actions
   setLocation: (location: LatLng | null) => void;
@@ -26,7 +25,6 @@ interface AppState {
   setSearchError: (error: string | null) => void;
   setIsLoadingData: (loading: boolean) => void;
   setIsLoadingLocation: (loading: boolean) => void;
-  incrementAchievementRefreshKey: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -41,7 +39,6 @@ export const useAppStore = create<AppState>((set) => ({
   dataError: null,
   locationError: null,
   searchError: null,
-  achievementRefreshKey: 0,
 
   // Actions
   setLocation: (location) => set({ userLocation: location }),
@@ -65,7 +62,4 @@ export const useAppStore = create<AppState>((set) => ({
   setIsLoadingData: (loading) => set({ isLoadingData: loading }),
 
   setIsLoadingLocation: (loading) => set({ isLoadingLocation: loading }),
-
-  incrementAchievementRefreshKey: () =>
-    set((state) => ({ achievementRefreshKey: state.achievementRefreshKey + 1 })),
 }));

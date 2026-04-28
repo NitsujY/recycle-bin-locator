@@ -7,7 +7,6 @@ import { CategoryIcon } from "../CategoryIcon/CategoryIcon";
 export interface CollectionPointCardProps {
   point: CollectionPoint;
   isSelected?: boolean;
-  onLogVisit: (point: CollectionPoint) => void;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -35,13 +34,11 @@ function formatDistance(metres: number): string {
  * - Renders a distance badge when `distanceMetres` is defined.
  * - Renders one icon per accepted material category with an accessible label.
  * - Shows opening hours free-text when `openingHours.raw` is present.
- * - Provides a "Log Visit" button that calls `onLogVisit(point)`.
  * - Applies a green highlight ring when `isSelected` is true.
  */
 export function CollectionPointCard({
   point,
   isSelected = false,
-  onLogVisit,
 }: CollectionPointCardProps) {
   const { t, i18n } = useTranslation();
 
@@ -55,7 +52,7 @@ export function CollectionPointCard({
       className={[
         "rounded-xl border bg-white p-4 shadow-sm transition-all duration-150",
         isSelected
-          ? "ring-2 ring-green-500 border-green-500"
+          ? "ring-2 ring-green-500 border-green-500 bg-green-50"
           : "border-gray-200 hover:border-green-300",
       ].join(" ")}
       aria-current={isSelected ? "true" : undefined}
@@ -80,7 +77,7 @@ export function CollectionPointCard({
           aria-label={t("category.accepted_label", "Accepted categories")}
         >
           {point.acceptedCategories.map((cat) => (
-            <span key={cat} aria-label={t(`category.${cat}`)}>
+            <span key={cat} aria-label={t(`category.${cat}`)} title={t(`category.${cat}`)}>
               <CategoryIcon category={cat} className="h-6 w-6" />
             </span>
           ))}
@@ -92,18 +89,6 @@ export function CollectionPointCard({
         <p className="mt-2 text-xs text-gray-500">{point.openingHours.raw}</p>
       )}
 
-      {/* ── Log Visit button ── */}
-      <button
-        type="button"
-        onClick={() => onLogVisit(point)}
-        className={[
-          "mt-3 w-full rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white",
-          "hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400",
-          "transition-colors duration-150",
-        ].join(" ")}
-      >
-        {t("log_visit")}
-      </button>
     </article>
   );
 }

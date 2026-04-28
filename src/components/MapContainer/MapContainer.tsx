@@ -8,6 +8,9 @@ interface MapContainerProps {
   zoom?: number;
   points?: CollectionPoint[];
   onMarkerClick?: (id: string) => void;
+  onZoomChange?: (distanceMetres: number) => void;
+  onViewportIdle?: (center: LatLng) => void;
+  isExpanded?: boolean;
 }
 
 export function MapContainer({
@@ -16,6 +19,9 @@ export function MapContainer({
   zoom = 13,
   points,
   onMarkerClick,
+  onZoomChange,
+  onViewportIdle,
+  isExpanded = false,
 }: MapContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +33,12 @@ export function MapContainer({
 
     if (onMarkerClick) {
       adapter.onMarkerClick(onMarkerClick);
+    }
+    if (onZoomChange) {
+      adapter.onZoomChange(onZoomChange);
+    }
+    if (onViewportIdle) {
+      adapter.onViewportIdle(onViewportIdle);
     }
 
     return () => {
@@ -42,10 +54,20 @@ export function MapContainer({
     }
   }, [adapter, points]);
 
+  useEffect(() => {
+    adapter.invalidateSize();
+    const t1 = requestAnimationFrame(() => adapter.invalidateSize());
+    const t2 = requestAnimationFrame(() => adapter.invalidateSize());
+    return () => {
+      cancelAnimationFrame(t1);
+      cancelAnimationFrame(t2);
+    };
+  }, [adapter, isExpanded]);
+
   return (
     <div
       ref={containerRef}
-      className="w-full h-64 md:h-96"
+      className={isExpanded ? "w-full flex-1 min-h-[60vh]" : "w-full h-80 md:h-[50vh] min-h-[320px]"}
       aria-label="Map showing recycling collection points"
       role="application"
     />

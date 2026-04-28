@@ -58,6 +58,13 @@ export function filterByCategories(
   }
 
   return points.filter((point) =>
-    point.acceptedCategories.some((cat) => categories.has(cat))
+    point.acceptedCategories.some((cat) => {
+      if (categories.has(cat)) {
+        return true;
+      }
+
+      // Backward compatibility: older snapshots used "other" for metal bins.
+      return cat === MaterialCategory.Other && categories.has(MaterialCategory.Metal);
+    })
   );
 }

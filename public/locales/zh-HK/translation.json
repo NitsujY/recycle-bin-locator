@@ -1,12 +1,18 @@
 {
   "app.title": "回收桶位置搜尋",
   "search.placeholder": "輸入地址或地點名稱…",
+  "distance.filter_label": "範圍",
+  "map.enter_fullscreen": "全螢幕地圖",
+  "map.exit_fullscreen": "退出全螢幕",
   "category.paper": "紙張",
+  "category.metal": "金屬",
   "category.plastic": "塑膠",
   "category.glass": "玻璃",
   "category.light_bulb": "燈泡",
   "category.battery": "電池",
   "category.other": "其他",
+  "category.onboarding_title": "快速物料篩選",
+  "category.onboarding_prompt": "請先選擇你現在要回收的物料。按 Esc 可關閉。",
   "badge.first_visit": "第一步",
   "badge.visits_10": "10次回收",
   "badge.visits_50": "50次回收",
@@ -25,7 +31,6 @@
   "stats.total_visits": "總回收次數",
   "stats.unique_points": "已到訪回收點",
   "stats.categories_recycled": "已回收類別",
-  "log_visit": "記錄回收",
   "achievements": "成就",
   "language": "語言"
 }
