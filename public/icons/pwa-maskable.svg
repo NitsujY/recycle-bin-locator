@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16a34a"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- maskable: use full-bleed design on square canvas -->
+  <rect width="1024" height="1024" fill="url(#g2)"/>
+
+  <!-- white pin (circle + triangle tail) -->
+  <circle cx="512" cy="320" r="220" fill="#ffffff"/>
+  <polygon points="512,560 420,820 604,820" fill="#ffffff"/>
+
+  <!-- leaf symbol -->
+  <path d="M512 240 C 640 340, 640 520, 512 620 C 384 520, 384 340, 512 240 Z" fill="#027a48"/>
+  <path d="M512 300 C 572 340, 572 420, 512 460 C 452 420, 452 340, 512 300 Z" fill="#16a34a"/>
+  <path d="M512 340 C 540 360, 540 400, 512 420 C 484 400, 484 360, 512 340 Z" fill="#68d391"/>
+</svg>

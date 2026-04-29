@@ -8,7 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/pwa-192.png', 'icons/pwa-512.png'],
+      includeAssets: [
+        'favicon.svg',
+        'icons/pwa.svg',
+        'icons/pwa-maskable.svg',
+        'icons/pwa-192.png',
+        'icons/pwa-512.png',
+      ],
       manifest: {
         name: 'HK Recycle Locator',
         short_name: 'HK Recycle',
@@ -34,6 +40,17 @@ export default defineConfig({
             src: 'icons/pwa-maskable-512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/pwa.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+          },
+          {
+            src: 'icons/pwa-maskable.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
             purpose: 'maskable',
           },
         ],
