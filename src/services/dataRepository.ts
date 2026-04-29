@@ -1,5 +1,12 @@
 import type { CollectionPoint, DatasetManifest } from "../types/index";
 
+export interface DatasetResult {
+  points: CollectionPoint[];
+  generatedAt: string;
+  sourceIds: string[];
+  totalPoints: number;
+}
+
 /**
  * URL of the normalised dataset JSON file in the data repository.
  * Configurable to allow pointing at a different host (e.g. GitHub Pages vs Raw).
@@ -31,6 +38,9 @@ export const CACHE_KEY = "rbl_dataset_cache";
 /** Shape of the value stored in localStorage under CACHE_KEY. */
 interface CacheEntry {
   points: CollectionPoint[];
+  generatedAt: string;
+  sourceIds: string[];
+  totalPoints: number;
   cachedAt: number;
 }
 
@@ -81,11 +91,11 @@ function writeCache(entry: CacheEntry): void {
  *
  * Requirements: 6.1, 6.2, 6.3, 6.4
  */
-export async function fetchDataset(): Promise<CollectionPoint[]> {
+export async function fetchDataset(): Promise<DatasetResult> {
   // Step 1: Check for a fresh cache hit
   const cached = readCache();
   if (cached !== null && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
-    return cached.points;
+    return { points: cached.points, generatedAt: cached.generatedAt, sourceIds: cached.sourceIds, totalPoints: cached.totalPoints };
   }
 
   // Step 2: Attempt a network fetch
@@ -98,13 +108,13 @@ export async function fetchDataset(): Promise<CollectionPoint[]> {
     const points = manifest.points;
 
     // Step 3: Store fresh data in cache
-    writeCache({ points, cachedAt: Date.now() });
+    writeCache({ points, generatedAt: manifest.generatedAt, sourceIds: manifest.sourceIds, totalPoints: manifest.totalPoints, cachedAt: Date.now() });
 
-    return points;
+    return { points, generatedAt: manifest.generatedAt, sourceIds: manifest.sourceIds, totalPoints: manifest.totalPoints };
   } catch (networkError) {
     // Step 4a: Network failure — fall back to stale cache if available
     if (cached !== null) {
-      return cached.points;
+      return { points: cached.points, generatedAt: cached.generatedAt, sourceIds: cached.sourceIds, totalPoints: cached.totalPoints };
     }
 
     // Step 4b: No cache at all — surface a user-facing error

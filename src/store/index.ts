@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { LatLng, CollectionPoint, MaterialCategory } from "../types/index";
 
+export interface DatasetMeta {
+  generatedAt: string;  // ISO 8601
+  sourceIds: string[];
+  totalPoints: number;
+}
+
 interface AppState {
   // State slices
   userLocation: LatLng | null;
@@ -13,6 +19,7 @@ interface AppState {
   dataError: string | null;
   locationError: string | null;
   searchError: string | null;
+  datasetMeta: DatasetMeta | null;
 
   // Actions
   setLocation: (location: LatLng | null) => void;
@@ -25,6 +32,7 @@ interface AppState {
   setSearchError: (error: string | null) => void;
   setIsLoadingData: (loading: boolean) => void;
   setIsLoadingLocation: (loading: boolean) => void;
+  setDatasetMeta: (meta: DatasetMeta | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -39,6 +47,7 @@ export const useAppStore = create<AppState>((set) => ({
   dataError: null,
   locationError: null,
   searchError: null,
+  datasetMeta: null,
 
   // Actions
   setLocation: (location) => set({ userLocation: location }),
@@ -62,4 +71,6 @@ export const useAppStore = create<AppState>((set) => ({
   setIsLoadingData: (loading) => set({ isLoadingData: loading }),
 
   setIsLoadingLocation: (loading) => set({ isLoadingLocation: loading }),
+
+  setDatasetMeta: (meta) => set({ datasetMeta: meta }),
 }));

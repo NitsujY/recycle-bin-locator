@@ -83,8 +83,9 @@ function App() {
 
         // Fetch dataset and sort by distance
         store.setIsLoadingData(true);
-        return fetchDataset().then((points) => {
-          store.setAllPoints(points);
+        return fetchDataset().then((result) => {
+          store.setAllPoints(result.points);
+          store.setDatasetMeta({ generatedAt: result.generatedAt, sourceIds: result.sourceIds, totalPoints: result.totalPoints });
           store.setIsLoadingData(false);
           mapAdapterRef.current.fitRange(location, distanceRangeMetres);
         });
@@ -100,8 +101,9 @@ function App() {
 
         store.setIsLoadingData(true);
         fetchDataset()
-          .then((points) => {
-            store.setAllPoints(points);
+          .then((result) => {
+            store.setAllPoints(result.points);
+            store.setDatasetMeta({ generatedAt: result.generatedAt, sourceIds: result.sourceIds, totalPoints: result.totalPoints });
             store.setIsLoadingData(false);
           })
           .catch(() => {
@@ -284,6 +286,16 @@ const handleDistanceChange = useCallback((val: number) => {
               </button>
             </div>
           </section>
+
+          {/* Data source info bar */}
+          {store.datasetMeta && !isMapExpanded && (
+            <p className="text-xs text-gray-400 text-right px-1">
+              {t('data.last_updated', 'Last updated')}:{' '}
+              {new Date(store.datasetMeta.generatedAt).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: 'numeric' })}{' '}
+              · {t('data.source', 'Source')}: {store.datasetMeta.sourceIds.join(', ')}{' '}
+              · {store.datasetMeta.totalPoints.toLocaleString()} {t('data.points', 'points')}
+            </p>
+          )}
         </div>
       </main>
 

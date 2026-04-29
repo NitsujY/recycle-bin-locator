@@ -32,5 +32,8 @@
   "stats.unique_points": "已到訪回收點",
   "stats.categories_recycled": "已回收類別",
   "achievements": "成就",
-  "language": "語言"
+  "language": "語言",
+  "data.last_updated": "最後更新",
+  "data.source": "來源",
+  "data.points": "個地點"
 }

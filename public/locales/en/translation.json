@@ -32,5 +32,8 @@
   "stats.unique_points": "Unique Points Visited",
   "stats.categories_recycled": "Categories Recycled",
   "achievements": "Achievements",
-  "language": "Language"
+  "language": "Language",
+  "data.last_updated": "Last updated",
+  "data.source": "Source",
+  "data.points": "points"
 }
