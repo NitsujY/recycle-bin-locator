@@ -169,6 +169,8 @@ function App() {
   const handleMarkerClick = useCallback((id: string) => {
     store.setSelectedPoint(id);
     mapAdapterRef.current.highlightMarker(id);
+    // openPopup is already handled inside the adapter's marker click handler;
+    // calling it here ensures list-initiated selections also open the popup.
     mapAdapterRef.current.openPopup(id);
     // Scroll the matching card into view using a data attribute
     const el = document.querySelector(`[data-point-id="${id}"]`);

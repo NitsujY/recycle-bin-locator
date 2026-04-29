@@ -33,6 +33,7 @@ export class LeafletMapAdapter implements IMapComponent {
   private idleTimer: ReturnType<typeof setTimeout> | null = null;
   private locale = 'en';
   private latestPoints: CollectionPoint[] = [];
+  private openPopupId: string | null = null;
   private handleResize = () => {
     this.map?.invalidateSize();
   };
@@ -122,6 +123,15 @@ export class LeafletMapAdapter implements IMapComponent {
       marker.on('click', (e) => {
         // Stop map click from firing first (which would close the popup before the new one opens)
         L.DomEvent.stopPropagation(e);
+        // Immediately open this popup (close previous if different) before notifying app
+        if (this.openPopupId !== point.id) {
+          if (this.openPopupId !== null) {
+            const prev = this.markers.get(this.openPopupId);
+            if (prev) prev.closePopup();
+          }
+          marker.openPopup();
+          this.openPopupId = point.id;
+        }
         if (this.clickHandler) {
           this.clickHandler(point.id);
         }
@@ -181,11 +191,15 @@ export class LeafletMapAdapter implements IMapComponent {
 
   openPopup(id: string): void {
     if (!this.map) return;
-    // Close any currently open popup first so switching markers works in one click
-    this.map.closePopup();
+    if (this.openPopupId === id) return; // already open, nothing to do
+    if (this.openPopupId !== null) {
+      const prev = this.markers.get(this.openPopupId);
+      if (prev) prev.closePopup();
+    }
     const marker = this.markers.get(id);
     if (marker) {
       marker.openPopup();
+      this.openPopupId = id;
     }
   }
 
@@ -200,6 +214,7 @@ export class LeafletMapAdapter implements IMapComponent {
     }
 
     this.markers.clear();
+    this.openPopupId = null;
   }
 
   /**
