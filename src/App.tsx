@@ -55,18 +55,24 @@ function App() {
     store.setFilteredPoints(nextPoints);
     mapAdapterRef.current.setMarkers(nextPoints);
 
+    // Re-apply highlight after markers are recreated (e.g. after filter change)
     if (store.selectedPointId) {
       mapAdapterRef.current.highlightMarker(store.selectedPointId);
     }
   }, [
     distanceRangeMetres,
-    distanceRangeMetres,
     store.allPoints,
     store.selectedCategories,
-    store.selectedPointId,
     store.userLocation,
     store.setFilteredPoints,
   ]);
+
+  // Highlight the selected marker whenever selection changes without recreating markers
+  useEffect(() => {
+    if (store.selectedPointId) {
+      mapAdapterRef.current.highlightMarker(store.selectedPointId);
+    }
+  }, [store.selectedPointId]);
 
   // ── Startup sequence (task 10.2) ──────────────────────────────────────────
   useEffect(() => {
