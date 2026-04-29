@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/recycle-bin-locator/sw.js', { scope: '/recycle-bin-locator/' })})}

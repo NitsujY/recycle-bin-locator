@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nitsujy.github.io/recycle-bin-locator/sitemap.xml
