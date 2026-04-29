@@ -55,8 +55,12 @@ function readCache(): CacheEntry | null {
     const parsed = JSON.parse(raw) as CacheEntry;
     if (
       !Array.isArray(parsed.points) ||
-      typeof parsed.cachedAt !== "number"
+      typeof parsed.cachedAt !== "number" ||
+      typeof parsed.generatedAt !== "string" ||
+      !Array.isArray(parsed.sourceIds)
     ) {
+      // Invalidate stale cache entries from older app versions
+      localStorage.removeItem(CACHE_KEY);
       return null;
     }
     return parsed;

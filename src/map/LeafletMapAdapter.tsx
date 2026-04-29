@@ -6,6 +6,18 @@ import { renderToString } from 'react-dom/server';
 import { CategoryIcon } from '../components/CategoryIcon/CategoryIcon';
 import type { MaterialCategory } from '../types/index';
 
+// Fix Leaflet default marker icon paths broken by Vite's asset bundling
+import markerIconUrl from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIconUrl,
+  iconRetinaUrl: markerIconRetinaUrl,
+  shadowUrl: markerShadowUrl,
+});
+
 /**
  * Phase 1 map adapter — wraps Leaflet.js and implements IMapComponent.
  * All Leaflet imports are confined to this file; MapContainer only sees IMapComponent.
