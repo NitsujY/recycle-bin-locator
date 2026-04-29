@@ -16,7 +16,7 @@ export interface MotivationBannerProps {
  * line, and filters out empty strings.
  */
 export async function loadMessages(locale: string): Promise<string[]> {
-  const url = `/locales/${locale}/motivation.txt`;
+  const url = `${import.meta.env.BASE_URL}locales/${locale}/motivation.txt`;
   const response = await fetch(url);
   const text = await response.text();
   return text
