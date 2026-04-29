@@ -151,8 +151,10 @@ function App() {
       if (point) {
         mapAdapterRef.current.panTo(point.coordinates, 18);
         mapAdapterRef.current.highlightMarker(id);
-        mapAdapterRef.current.openPopup(id);
-        
+        // Delay popup so map pan animation can settle before opening
+        setTimeout(() => {
+          mapAdapterRef.current.openPopup(id);
+        }, 350);
         // Auto close the drawer on mobile when an item is selected so they can see the map detail
         if (window.innerWidth < 1024) {
           setIsListExpanded(false);
@@ -261,7 +263,7 @@ const handleDistanceChange = useCallback((val: number) => {
               />
               
               {/* Distance Filter on Map Overlay */}
-              <div className="absolute bottom-4 left-2 z-[400]">
+              <div className="absolute bottom-4 right-2 z-[400]">
                 <DistanceFilter
                   value={distanceRangeMetres}
                   onChange={handleDistanceChange}

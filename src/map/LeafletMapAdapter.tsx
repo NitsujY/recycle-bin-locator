@@ -107,7 +107,9 @@ export class LeafletMapAdapter implements IMapComponent {
         offset: [0, -10]
       });
 
-      marker.on('click', () => {
+      marker.on('click', (e) => {
+        // Stop map click from firing first (which would close the popup before the new one opens)
+        L.DomEvent.stopPropagation(e);
         if (this.clickHandler) {
           this.clickHandler(point.id);
         }
@@ -167,6 +169,8 @@ export class LeafletMapAdapter implements IMapComponent {
 
   openPopup(id: string): void {
     if (!this.map) return;
+    // Close any currently open popup first so switching markers works in one click
+    this.map.closePopup();
     const marker = this.markers.get(id);
     if (marker) {
       marker.openPopup();

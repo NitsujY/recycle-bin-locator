@@ -1,92 +1,89 @@
-# Recycle Bin Locator
+# HK Recycle Locator 🌏♻️
 
 [![MIT License](https://img.shields.io/badge/licence-MIT-green.svg)](./LICENCE)
+[![Deploy to GitHub Pages](https://github.com/NitsujY/recycle-bin-locator/actions/workflows/deploy.yml/badge.svg)](https://github.com/NitsujY/recycle-bin-locator/actions/workflows/deploy.yml)
 
-A fully static, client-side web application that helps users find nearby recycling collection points. Select the material you want to recycle, and the app shows the nearest suitable bins on a map and ranked list — no account required, no server needed.
+**Find the nearest recycling collection points across Hong Kong — instantly, on your phone or desktop.**
 
-- Detects your location automatically (or search by address)
-- Filter by material category: Paper, Metal, Plastic, Glass, Light Bulb, Battery, and more
-- Supports English and Traditional Chinese based on your browser locale
-- Deployed on GitHub Pages at zero hosting cost
+🔗 **Live app:** [nitsujy.github.io/recycle-bin-locator](https://nitsujy.github.io/recycle-bin-locator/)
 
-## Product Phases
+---
 
-- Phase 1 (current): map + search + distance/material filtering + bilingual UI.
-- Phase 2 (planned): account-based achievement and visit logging.
+## What it does
 
-Achievement-related UI is intentionally disabled in Phase 1 and will return in Phase 2 when user accounts are introduced.
+HK Recycle Locator helps Hong Kong residents find nearby recycling drop-off points maintained by the Environmental Protection Department (EPD):
 
-## Live Demo
+- 📍 **Interactive map** showing recycling points near your current location
+- ♻️ **Material filter** — paper, plastic, metal, glass, light bulbs, batteries
+- 🔍 **Address / district search** to find points anywhere in Hong Kong
+- 📋 **Slide-out location list** with address and accepted materials at a glance
+- 🌐 **English and Traditional Chinese** interface
+- 🏆 **Achievement system** that rewards regular recycling visits
 
-[https://{your-username}.github.io/recycle-bin-locator](https://{your-username}.github.io/recycle-bin-locator)
+---
 
-## Tech Stack
+## Keywords
+
+Hong Kong recycling locator · 香港回收點 · 回收地圖 · HK recycle map · EPD recycling · paper recycling HK · plastic recycling Hong Kong · battery drop-off Hong Kong · glass recycling HK · metal recycling · 環保回收 · 廢物回收 · recycle bin near me Hong Kong
+
+---
+
+## Tech stack
 
 | Layer | Technology |
-|---|---|
-| Framework | React + TypeScript |
-| Build tool | Vite |
+|-------|-----------|
+| UI framework | React 19 + TypeScript |
+| Styling | Tailwind CSS |
 | Map | Leaflet.js + OpenStreetMap |
 | Geocoding | Nominatim (OSM) |
-| State management | Zustand |
+| State | Zustand |
 | i18n | i18next |
-| Styling | Tailwind CSS |
+| Build | Vite |
+| Data source | Hong Kong EPD open dataset |
+| CI/CD | GitHub Actions → GitHub Pages |
 
-## Local Development
+---
+
+## Local development
 
 ```bash
+# Install dependencies
 npm install
+
+# Start dev server (http://localhost:5173)
 npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npx vitest --run
 ```
 
-The app runs at `http://localhost:5173` by default.
+## Data pipeline
 
-To refresh real data from the sibling data repository once (recommended default):
+Recycling point data is automatically fetched and normalised from the HK EPD open dataset by the companion [`recycle-bin-locator-data`](https://github.com/NitsujY/recycle-bin-locator-data) repository and published as `public/collection_points.json`.
+
+To sync the latest data locally:
 
 ```bash
 ./sync-latest-data.sh
 ```
 
-To keep polling in watch mode:
+---
 
-```bash
-POLL_INTERVAL_SECONDS=900 ./sync-latest-data.sh --watch
-```
+## Deployment
 
-To make production load data directly from the data repository (so app repo does not need committed snapshots), set:
+Every push to `main` automatically builds and deploys to **GitHub Pages** via the workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-```bash
-VITE_DATA_REPO_URL=https://raw.githubusercontent.com/NitsujY/recycle-bin-locator-data/main/data/collection_points.json
-```
+Live URL: **https://nitsujy.github.io/recycle-bin-locator/**
 
-To run the test suite:
+---
 
-```bash
-npx vitest --run
-```
+## Contributing
 
-## How to Add a New Language
-
-1. Create `public/locales/{locale}/translation.json` with all translation keys (copy `public/locales/en/translation.json` as a starting point and translate each value).
-2. Create `public/locales/{locale}/motivation.txt` with at least one motivational message per line.
-3. Add the locale code to the `SUPPORTED_LOCALES` constant in `src/i18n/index.ts`.
-
-No other code changes are required.
-
-## How to Add a New Data Source
-
-Implement the `SourceAdapter` interface defined in `recycle-bin-locator-data/sources/SourceAdapter.ts`:
-
-```typescript
-interface SourceAdapter {
-  readonly sourceId: string;
-  fetch(): Promise<RawRecord[]>;
-  normalise(raw: RawRecord[]): CollectionPoint[];
-}
-```
-
-Create a new adapter file under `recycle-bin-locator-data/sources/{source-id}/` and register it in the pipeline entry point. No changes to existing adapters are needed.
+Pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Licence
 
-[MIT](./LICENCE)
+[MIT](LICENCE)

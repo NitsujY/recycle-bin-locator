@@ -26,8 +26,9 @@ const ALL_CATEGORIES: MaterialCategory[] = [
   MaterialCategory.Other,
 ];
 
-// Active highlight classes applied to selected category items
-const ACTIVE_CLASS = "border-green-600 bg-green-50";
+// Active highlight classes applied to selected items
+const ACTIVE_BORDER = "border-green-600 bg-green-50";
+const INACTIVE_BORDER = "border-gray-200 bg-white";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -114,8 +115,8 @@ export function CategorySelector({
                   "rounded-full border p-1.5 transition",
                   "focus:outline-none focus:ring-2 focus:ring-green-400",
                   isSelected
-                    ? "border-green-600 bg-green-50"
-                    : "border-gray-200 bg-white hover:bg-green-50",
+                    ? ACTIVE_BORDER
+                    : `${INACTIVE_BORDER} hover:bg-green-50`,
                 ].join(" ")}
               >
                 <CategoryIcon category={category} className="h-5 w-5" />
@@ -171,10 +172,10 @@ export function CategorySelector({
                     onClick={() => handleToggle(category)}
                     aria-pressed={isSelected}
                     className={[
-                      "flex flex-col items-center gap-1 rounded-lg p-2 border border-gray-200",
+                      "flex flex-col items-center gap-1 rounded-lg p-2 border",
                       "cursor-pointer select-none transition-all duration-150",
                       "hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-400",
-                      isSelected ? ACTIVE_CLASS : "bg-white",
+                      isSelected ? ACTIVE_BORDER : INACTIVE_BORDER,
                     ].join(" ")}
                   >
                     <CategoryIcon category={category} className="h-8 w-8" />
@@ -245,8 +246,8 @@ export function CategorySelector({
                     className={[
                       "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium",
                       isSelected
-                        ? "border-green-600 bg-green-50"
-                        : "border-gray-200 bg-white hover:bg-green-50",
+                        ? ACTIVE_BORDER
+                        : `${INACTIVE_BORDER} hover:bg-green-50`,
                     ].join(" ")}
                   >
                     <CategoryIcon category={category} className="h-6 w-6" />
@@ -270,8 +271,8 @@ export function CategorySelector({
                     className={[
                       "flex items-center justify-center gap-2 rounded-lg border px-2 py-2 text-xs",
                       isSelected
-                        ? "border-green-600 bg-green-50"
-                        : "border-gray-200 bg-white hover:bg-green-50",
+                        ? ACTIVE_BORDER
+                        : `${INACTIVE_BORDER} hover:bg-green-50`,
                     ].join(" ")}
                   >
                     <CategoryIcon category={category} className="h-4 w-4" />
