@@ -10,7 +10,7 @@ import type { CollectionPoint, DatasetManifest } from "../types/index";
  *
  * Requirements: 6.1, 6.2
  */
-export const DATA_REPO_URL = "/collection_points.json";
+export const DATA_REPO_URL = `${import.meta.env.BASE_URL}collection_points.json`;
 export const RESOLVED_DATA_REPO_URL =
   import.meta.env.VITE_DATA_REPO_URL ?? DATA_REPO_URL;
 

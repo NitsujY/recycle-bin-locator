@@ -1,6 +1,7 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
-import HttpBackend from "i18next-http-backend";
+import enTranslation from "../../public/locales/en/translation.json";
+import zhHKTranslation from "../../public/locales/zh-HK/translation.json";
 
 // Supported locales
 export const SUPPORTED_LOCALES = ["en", "zh-HK"] as const;
@@ -43,9 +44,8 @@ export function detectLocale(): SupportedLocale {
   return "en";
 }
 
-// Initialise i18next with the HTTP backend (loads from public/locales/)
+// Initialise i18next with bundled translations (no async HTTP load needed)
 i18next
-  .use(HttpBackend)
   .use(initReactI18next)
   .init({
     lng: detectLocale(),
@@ -53,8 +53,9 @@ i18next
     interpolation: {
       escapeValue: false, // React already escapes values
     },
-    backend: {
-      loadPath: `${import.meta.env.BASE_URL}locales/{{lng}}/translation.json`,
+    resources: {
+      en: { translation: enTranslation },
+      "zh-HK": { translation: zhHKTranslation },
     },
   });
 
