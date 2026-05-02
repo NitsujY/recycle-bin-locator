@@ -35,8 +35,12 @@ export const CACHE_TTL_MS = 3_600_000;
  */
 export const CACHE_KEY = "rbl_dataset_cache";
 
+/** Bump this when the cached data schema changes to force cache invalidation. */
+const CACHE_SCHEMA_VERSION = 3;
+
 /** Shape of the value stored in localStorage under CACHE_KEY. */
 interface CacheEntry {
+  schemaVersion: number;
   points: CollectionPoint[];
   generatedAt: string;
   sourceIds: string[];
@@ -54,6 +58,7 @@ function readCache(): CacheEntry | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CacheEntry;
     if (
+      parsed.schemaVersion !== CACHE_SCHEMA_VERSION ||
       !Array.isArray(parsed.points) ||
       typeof parsed.cachedAt !== "number" ||
       typeof parsed.generatedAt !== "string" ||
@@ -112,7 +117,7 @@ export async function fetchDataset(): Promise<DatasetResult> {
     const points = manifest.points;
 
     // Step 3: Store fresh data in cache
-    writeCache({ points, generatedAt: manifest.generatedAt, sourceIds: manifest.sourceIds, totalPoints: manifest.totalPoints, cachedAt: Date.now() });
+    writeCache({ schemaVersion: CACHE_SCHEMA_VERSION, points, generatedAt: manifest.generatedAt, sourceIds: manifest.sourceIds, totalPoints: manifest.totalPoints, cachedAt: Date.now() });
 
     return { points, generatedAt: manifest.generatedAt, sourceIds: manifest.sourceIds, totalPoints: manifest.totalPoints };
   } catch (networkError) {

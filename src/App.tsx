@@ -25,7 +25,7 @@ function App() {
   const { t, i18n } = useTranslation();
   const store = useAppStore();
   const mapAdapterRef = useRef<IMapComponent>(new LeafletMapAdapter());
-  const [distanceRangeMetres, setDistanceRangeMetres] = useState(100);
+  const [distanceRangeMetres, setDistanceRangeMetres] = useState(1000);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isListExpanded, setIsListExpanded] = useState(false);
 
@@ -188,12 +188,13 @@ function App() {
   }, [store.setLocation]);
 
   const handleZoomChange = useCallback((distanceMetres: number) => {
-    // Auto-update the distance range based on zoom level
-    // Only update if the zoom-based distance is significantly different
-    const minDistance = 500;
-    const maxDistance = 50000;
-    const clampedDistance = Math.max(minDistance, Math.min(maxDistance, distanceMetres));
-    setDistanceRangeMetres(clampedDistance);
+    // Snap to the nearest distance option based on zoom level
+    const OPTIONS = [500, 1000, 5000, 10000, 50000];
+    const clamped = Math.max(OPTIONS[0], Math.min(OPTIONS[OPTIONS.length - 1], distanceMetres));
+    const snapped = OPTIONS.reduce((prev, cur) =>
+      Math.abs(cur - clamped) < Math.abs(prev - clamped) ? cur : prev
+    );
+    setDistanceRangeMetres(snapped);
   }, []);
 const handleDistanceChange = useCallback((val: number) => {
     setDistanceRangeMetres(val);
@@ -244,10 +245,10 @@ const handleDistanceChange = useCallback((val: number) => {
                   type="button"
                   onClick={() => setIsListExpanded(true)}
                   className="shrink-0 flex items-center justify-center rounded-lg bg-white border border-gray-200 px-3 py-2 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-400"
-                  aria-label={t("map.show_list", "Show locations list")}
+                  aria-label={t("map.show_list")}
                 >
                   <ListBulletIcon className="h-5 w-5" />
-                  <span className="hidden sm:inline ml-2 text-sm font-medium">{t("map.show_list", "Locations")}</span>
+                  <span className="hidden sm:inline ml-2 text-sm font-medium">{t("map.show_list")}</span>
                 </button>
                 <div className="flex-1">
                   <SearchBar

@@ -20,9 +20,16 @@ const ALL_CATEGORIES: MaterialCategory[] = [
   MaterialCategory.Paper,
   MaterialCategory.Metal,
   MaterialCategory.Plastic,
+  MaterialCategory.PlasticBottle,
   MaterialCategory.Glass,
   MaterialCategory.LightBulb,
   MaterialCategory.Battery,
+  MaterialCategory.SmallAppliance,
+  MaterialCategory.RegulatedEquipment,
+  MaterialCategory.Clothes,
+  MaterialCategory.Bbq,
+  MaterialCategory.BeverageCarton,
+  MaterialCategory.FoodWaste,
   MaterialCategory.Other,
 ];
 
@@ -69,6 +76,20 @@ export function CategorySelector({
     }
   }, [isOnboardingOpen, countdown]);
 
+  // Debounce onFilterReady via useEffect so setSelected updater stays pure
+  // and the visual (button border) toggles immediately on every click.
+  useEffect(() => {
+    if (timerRef.current !== null) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      onFilterReady(new Set(selected));
+    }, graceMs);
+    return () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, graceMs]);
+
   const handleToggle = useCallback(
     (category: MaterialCategory) => {
       setSelected((prev) => {
@@ -78,21 +99,10 @@ export function CategorySelector({
         } else {
           next.add(category);
         }
-
-        // Clear any pending debounce timer and start a fresh one with the
-        // latest selection state.
-        if (timerRef.current !== null) {
-          clearTimeout(timerRef.current);
-        }
-        timerRef.current = setTimeout(() => {
-          timerRef.current = null;
-          onFilterReady(new Set(next));
-        }, graceMs);
-
         return next;
       });
     },
-    [graceMs, onFilterReady]
+    []
   );
 
   return (
@@ -160,7 +170,7 @@ export function CategorySelector({
               </button>
             </div>
 
-            <div role="group" className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+            <div role="group" className="grid grid-cols-4 gap-3 sm:grid-cols-7">
               {ALL_CATEGORIES.map((category) => {
                 const isSelected = selected.has(category);
                 const label = t(`category.${category}`);
@@ -232,8 +242,8 @@ export function CategorySelector({
               </button>
             </div>
 
-            <div className="mb-3 grid grid-cols-3 gap-3">
-              {[MaterialCategory.Paper, MaterialCategory.Metal, MaterialCategory.Plastic].map((category) => {
+            <div className="mb-3 grid grid-cols-4 gap-2 sm:grid-cols-7">
+              {ALL_CATEGORIES.map((category) => {
                 const isSelected = selected.has(category);
                 const label = t(`category.${category}`);
 
@@ -244,39 +254,14 @@ export function CategorySelector({
                     onClick={() => handleToggle(category)}
                     title={label}
                     className={[
-                      "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium",
+                      "flex flex-col items-center gap-1 rounded-xl border p-2 text-xs font-medium text-gray-700",
                       isSelected
                         ? ACTIVE_BORDER
                         : `${INACTIVE_BORDER} hover:bg-green-50`,
                     ].join(" ")}
                   >
-                    <CategoryIcon category={category} className="h-6 w-6" />
-                    <span>{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="grid grid-cols-4 gap-2">
-              {[MaterialCategory.Glass, MaterialCategory.LightBulb, MaterialCategory.Battery, MaterialCategory.Other].map((category) => {
-                const isSelected = selected.has(category);
-                const label = t(`category.${category}`);
-
-                return (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => handleToggle(category)}
-                    title={label}
-                    className={[
-                      "flex items-center justify-center gap-2 rounded-lg border px-2 py-2 text-xs",
-                      isSelected
-                        ? ACTIVE_BORDER
-                        : `${INACTIVE_BORDER} hover:bg-green-50`,
-                    ].join(" ")}
-                  >
-                    <CategoryIcon category={category} className="h-4 w-4" />
-                    <span>{label}</span>
+                    <CategoryIcon category={category} className="h-8 w-8" />
+                    <span className="text-center leading-tight">{label}</span>
                   </button>
                 );
               })}

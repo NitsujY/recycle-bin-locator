@@ -5,7 +5,7 @@ export interface DistanceFilterProps {
   onChange: (value: number) => void;
 }
 
-const DISTANCE_OPTIONS = [100, 200, 500] as const;
+const DISTANCE_OPTIONS = [500, 1000, 5000, 10000, 50000] as const;
 
 export function DistanceFilter({ value, onChange }: DistanceFilterProps) {
   const { t } = useTranslation();

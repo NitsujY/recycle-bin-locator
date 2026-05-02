@@ -4,14 +4,36 @@ export interface LatLng {
   lng: number;
 }
 
+// Location type — classifies a collection point by its physical setup
+export const LocationType = {
+  Bin:     "bin",      // Three-colour recycling bins at public place
+  Public:  "public",  // Public collection points (staffed)
+  Ngo:     "ngo",
+  Spot:    "spot",
+  Shop:    "shop",     // Street corner recycling shops
+  Station: "station",  // Recycling stations / stores
+  Private: "private",
+  Smart:   "smart",
+  Other:   "other",
+} as const;
+
+export type LocationType = (typeof LocationType)[keyof typeof LocationType];
+
 // Material category — const object + derived union type (enum-equivalent, erasable)
 export const MaterialCategory = {
   Paper: "paper",
   Metal: "metal",
   Plastic: "plastic",
+  PlasticBottle: "plastic_bottle",
   Glass: "glass",
   LightBulb: "light_bulb",
   Battery: "battery",
+  SmallAppliance: "small_appliance",
+  RegulatedEquipment: "regulated_equipment",
+  Clothes: "clothes",
+  Bbq: "bbq",
+  BeverageCarton: "beverage_carton",
+  FoodWaste: "food_waste",
   Other: "other",
 } as const;
 
@@ -37,6 +59,7 @@ export interface CollectionPoint {
   nameZhHK?: string;                 // Traditional Chinese name if available from source
   coordinates: LatLng;
   acceptedCategories: MaterialCategory[];
+  locationType?: LocationType;       // From the `legend` CSV column
   openingHours?: OpeningHours;       // Absent if not provided by source
   sourceId: string;                  // e.g. "hk-epd"
   lastUpdated: string;               // ISO 8601 date string from pipeline run

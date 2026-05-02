@@ -1,6 +1,8 @@
 import L from 'leaflet';
+import 'leaflet.markercluster';
 import type { IMapComponent } from './IMapComponent';
 import type { CollectionPoint, LatLng } from '../types/index';
+import { LocationType } from '../types/index';
 
 import { renderToString } from 'react-dom/server';
 import { CategoryIcon } from '../components/CategoryIcon/CategoryIcon';
@@ -18,6 +20,30 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadowUrl,
 });
 
+// Per-location-type marker icons — official HK WRA recycling point icons (1–7).
+// 1=bins, 2=public, 3=ngo, 4=spot, 5=street corner/station, 6=private, 7=smart
+function makeIcon(filename: string): L.Icon {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return L.icon({
+    iconUrl: `${base}/icons/${filename}`,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+}
+
+const LOCATION_TYPE_ICONS: Record<string, L.Icon> = {
+  [LocationType.Bin]:     makeIcon('recycling_point_1.png'),
+  [LocationType.Public]:  makeIcon('recycling_point_2.png'),
+  [LocationType.Ngo]:     makeIcon('recycling_point_3.png'),
+  [LocationType.Spot]:    makeIcon('recycling_point_4.png'),
+  [LocationType.Shop]:    makeIcon('recycling_point_5.png'),
+  [LocationType.Station]: makeIcon('recycling_point_5.png'),
+  [LocationType.Private]: makeIcon('recycling_point_6.png'),
+  [LocationType.Smart]:   makeIcon('recycling_point_7.png'),
+};
+const DEFAULT_MARKER_ICON = makeIcon('recycling_point_2.png');
+
 /**
  * Phase 1 map adapter — wraps Leaflet.js and implements IMapComponent.
  * All Leaflet imports are confined to this file; MapContainer only sees IMapComponent.
@@ -27,6 +53,7 @@ L.Icon.Default.mergeOptions({
 export class LeafletMapAdapter implements IMapComponent {
   private map: L.Map | null = null;
   private markers: Map<string, L.Marker> = new Map();
+  private clusterGroup: L.MarkerClusterGroup | null = null;
   private clickHandler: ((id: string) => void) | null = null;
   private viewportIdleHandler: ((center: LatLng) => void) | null = null;
   private zoomChangeHandler: ((distanceMetres: number) => void) | null = null;
@@ -50,6 +77,32 @@ export class LeafletMapAdapter implements IMapComponent {
         '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.map);
 
+    // Create cluster group with custom styling
+    this.clusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 60,
+      showCoverageOnHover: false,
+      iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        const size = count < 10 ? 36 : count < 100 ? 44 : 52;
+        return L.divIcon({
+          html: `<div style="
+            width:${size}px;height:${size}px;
+            border-radius:50%;
+            background:rgba(34,197,94,0.85);
+            border:3px solid #16a34a;
+            display:flex;align-items:center;justify-content:center;
+            color:#fff;font-weight:700;font-size:${size < 44 ? 13 : 15}px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.25);">
+            ${count}
+          </div>`,
+          className: '',
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+      },
+    });
+    this.clusterGroup.addTo(this.map);
+
     this.map.setView([center.lat, center.lng], zoom);
     // Leaflet needs a size recalculation when container dimensions settle.
     setTimeout(() => this.map?.invalidateSize(), 0);
@@ -67,13 +120,14 @@ export class LeafletMapAdapter implements IMapComponent {
       }, 1000);
     });
 
-    // Zoom change listener for distance-based filtering
-    this.map.on('zoom', () => {
+    // Zoom change listener for distance-based filtering — fires once after
+    // the zoom animation settles (zoomend) to avoid flooding during animation.
+    this.map.on('zoomend', () => {
       if (!this.map || !this.zoomChangeHandler) return;
       const zoomLevel = this.map.getZoom();
-      // Convert zoom level to approximate distance in metres
-      // At zoom 10: ~50km, zoom 12: ~15km, zoom 14: ~5km, zoom 16: ~1.5km, zoom 18: ~500m, zoom 20: ~200m
-      const distance = Math.round(40000000 / Math.pow(2, zoomLevel + 8));
+      // ~50 000 000 / 2^zoom gives a sensible radius in metres for HK latitude:
+      // zoom 10 → ~48 km, zoom 12 → ~12 km, zoom 14 → ~3 km, zoom 16 → ~760 m
+      const distance = Math.round(50000000 / Math.pow(2, zoomLevel));
       this.zoomChangeHandler(distance);
     });
   }
@@ -96,7 +150,9 @@ export class LeafletMapAdapter implements IMapComponent {
     this.clearMarkers();
 
     for (const point of points) {
-      const marker = L.marker([point.coordinates.lat, point.coordinates.lng]);
+      const icon = (point.locationType && LOCATION_TYPE_ICONS[point.locationType])
+        ?? DEFAULT_MARKER_ICON;
+      const marker = L.marker([point.coordinates.lat, point.coordinates.lng], { icon });
       const markerLabel = this.locale === 'zh-HK' && point.nameZhHK ? point.nameZhHK : point.name;
       const categoriesHtml = point.acceptedCategories
         .map((cat) => {
@@ -107,17 +163,29 @@ export class LeafletMapAdapter implements IMapComponent {
           );
         })
         .join('');
+      const hoursRaw = point.openingHours?.raw;
+      const hoursLabel = this.locale === 'zh-HK' ? '⏰ 開放時間' : '⏰ Opening Hours';
+      const hoursHtml = hoursRaw
+        ? `<details style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;text-align:left;">
+            <summary style="cursor:pointer;font-size:11px;font-weight:600;color:#16a34a;list-style:none;display:flex;align-items:center;gap:4px;user-select:none;">
+              <span style="font-size:10px;">▶</span>${hoursLabel}
+            </summary>
+            <p style="margin:5px 0 0;font-size:11px;color:#374151;white-space:pre-wrap;word-break:break-word;max-width:260px;">${hoursRaw.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+          </details>`
+        : '';
       const tooltipHtml = `
-        <div style="text-align: center; min-width: 120px;">
-          <strong style="display:block; margin-bottom:4px; text-wrap: wrap;">${markerLabel}</strong>
-          <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+        <div style="text-align:center;min-width:140px;max-width:280px;">
+          <strong style="display:block;margin-bottom:4px;white-space:normal;">${markerLabel}</strong>
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;">
             ${categoriesHtml}
           </div>
+          ${hoursHtml}
         </div>
       `;
 
       marker.bindPopup(tooltipHtml, {
-        offset: [0, -10]
+        offset: [0, -10],
+        maxWidth: 300,
       });
 
       marker.on('click', (e) => {
@@ -137,8 +205,12 @@ export class LeafletMapAdapter implements IMapComponent {
         }
       });
 
-      marker.addTo(this.map);
       this.markers.set(point.id, marker);
+    }
+
+    // Add all markers to cluster group in one batch for performance
+    if (this.clusterGroup) {
+      this.clusterGroup.addLayers(Array.from(this.markers.values()));
     }
   }
 
@@ -209,8 +281,8 @@ export class LeafletMapAdapter implements IMapComponent {
   clearMarkers(): void {
     if (!this.map) return;
 
-    for (const marker of this.markers.values()) {
-      marker.remove();
+    if (this.clusterGroup) {
+      this.clusterGroup.clearLayers();
     }
 
     this.markers.clear();
@@ -248,6 +320,10 @@ export class LeafletMapAdapter implements IMapComponent {
     if (this.idleTimer) {
       clearTimeout(this.idleTimer);
       this.idleTimer = null;
+    }
+    if (this.clusterGroup) {
+      this.clusterGroup.clearLayers();
+      this.clusterGroup = null;
     }
     this.map.remove();
     this.map = null;
